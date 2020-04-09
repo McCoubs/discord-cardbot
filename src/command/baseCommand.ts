@@ -5,6 +5,7 @@ import { getLogger } from '../utils/logger';
 import { MongoConnector } from '../mongo/mongoConnector';
 import { Service } from '../di/serviceDecorator';
 import { DiscordService } from '../services/discordService';
+import { GamesService } from '../services/gamesService';
 
 export interface Command {
   name: string
@@ -21,7 +22,12 @@ export class BaseCommand implements Command {
   bot: Client;
   logger: Logger = getLogger('commands');
 
-  constructor(public ds: DiscordService, public mc: MongoConnector, public rs: RedisService) {
+  constructor(
+    public ds: DiscordService,
+    public mc: MongoConnector,
+    public rs: RedisService,
+    public gs: GamesService
+  ) {
     this.bot = ds.client;
   }
 

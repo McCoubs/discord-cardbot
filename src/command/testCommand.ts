@@ -1,7 +1,7 @@
 import { BaseCommand } from './baseCommand';
-import { RedisCommand } from "../services/redisService";
+import { RedisCommand } from '../services/redisService';
 
-export class Test extends BaseCommand {
+export class TestCommand extends BaseCommand {
   name = 'test';
 
   execute(rc: RedisCommand) {

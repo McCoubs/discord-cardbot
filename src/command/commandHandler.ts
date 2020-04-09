@@ -9,7 +9,10 @@ import { DiscordService } from '../services/discordService';
 import { RedisQueueService } from '../services/redisQueueService';
 import { Service } from '../di/serviceDecorator';
 import { Injector } from '../di/injector';
-import { Test } from './test';
+import { TestCommand } from './testCommand';
+import { CreateCommand } from './createCommand';
+import { JoinCommand } from './joinCommand';
+import { environment } from '../config/environment';
 
 const logger = getLogger('commands');
 
@@ -20,8 +23,18 @@ export class CommandHandler {
 
   featureFlags = [
     {
+      name: 'create',
+      class: CreateCommand,
+      active: true
+    },
+    {
+      name: 'join',
+      class: JoinCommand,
+      active: true
+    },
+    {
       name: 'test',
-      class: Test,
+      class: TestCommand,
       active: process.env.DISCORDBOT_ENV !== 'production',
     }
   ];
@@ -72,7 +85,7 @@ export class CommandHandler {
     }
     for (let c in this.commands) {
       let cmd: Command = this.commands[c];
-      out += `\`${c}\`: ${cmd.helpString}\n`;
+      out += `\`${environment.bot.prefix + c}\`: ${cmd.helpString}\n`;
       if (cmd.exampleString != '') out += `\t_${cmd.exampleString}_\n`;
     }
     return out;
