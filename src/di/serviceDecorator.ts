@@ -1,11 +1,9 @@
 export type GenericClassDecorator<T> = (target: T) => void;
-import "reflect-metadata"
+import 'reflect-metadata'
 export interface Type<T> {
   new(...args: any[]): T;
 }
 
 export const Service = (): GenericClassDecorator<Type<Object>> => {
-  return (target: Type<Object>) => {
-    // console.log(Reflect.getMetadata('design:paramtypes', target))
-  }
-}
+  return (target: Type<Object>) => {};
+};

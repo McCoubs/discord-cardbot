@@ -1,6 +1,6 @@
-import {Type} from "./serviceDecorator";
-import "reflect-metadata";
-import {getLogger} from "../utils/logger";
+import { Type } from './serviceDecorator';
+import 'reflect-metadata';
+import { getLogger } from '../utils/logger';
 
 const logger = getLogger('injector');
 export const Injector = new class {

@@ -1,21 +1,15 @@
-import {Ndefine} from "./ndefine";
-import {Command} from "./baseCommand";
-import {Client, MessageEmbed, TextChannel} from "discord.js";
-import {RedisCommand} from "../services/redisService";
-import {getChannel} from "../utils/utils";
-import {getLogger} from "../utils/logger";
-import {MongoConnector} from "../mongo/mongoConnector";
-import {User} from "../mongo/models/user.model";
-import {DiscordService} from "../services/discordService";
-import {RedisQueueService} from "../services/redisQueueService";
-import {Service} from "../di/serviceDecorator";
-import {Injector} from "../di/injector";
-import {Define} from "./define";
-import {Top} from "./top";
-import {Test} from "./test";
-import {Inv} from "./inv";
-import {Shop} from "./shop";
-import {Me} from "./me";
+import { Command } from './baseCommand';
+import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import { RedisCommand } from '../services/redisService';
+import { getChannel } from '../utils/utils';
+import { getLogger } from '../utils/logger';
+import { MongoConnector } from '../mongo/mongoConnector';
+import { User } from '../mongo/models/user.model';
+import { DiscordService } from '../services/discordService';
+import { RedisQueueService } from '../services/redisQueueService';
+import { Service } from '../di/serviceDecorator';
+import { Injector } from '../di/injector';
+import { Test } from './test';
 
 const logger = getLogger('commands');
 
@@ -26,47 +20,13 @@ export class CommandHandler {
 
   featureFlags = [
     {
-      name: 'ndefine',
-      class: Ndefine,
-      active: true,
-    },
-    {
-      name: 'top',
-      class: Top,
-      active: true,
-    },
-    {
-      name: 'define',
-      class: Define,
-      active: true,
-    },
-    {
-      name: 'me',
-      class: Me,
-      active: true,
-    },
-    {
-      name: 'shop',
-      class: Shop,
-      active: true,
-    },
-    {
-      name: 'inv',
-      class: Inv,
-      active: true,
-    },
-    {
       name: 'test',
       class: Test,
       active: process.env.DISCORDBOT_ENV !== 'production',
-    },
+    }
   ];
 
-  constructor(
-    public ds: DiscordService,
-    rsq: RedisQueueService,
-    mc: MongoConnector
-  ) {
+  constructor(public ds: DiscordService, rsq: RedisQueueService, mc: MongoConnector) {
     this.bot = ds.client;
     let bot = this.bot;
 
@@ -79,20 +39,19 @@ export class CommandHandler {
     rsq.onMessage((rc: RedisCommand) => {
       if (rc.command == 'help') {
         return getChannel(bot, rc).then((channel: TextChannel) => {
-          let embed = new MessageEmbed()
-            .setDescription(this.getHelp());
+          let embed = new MessageEmbed().setDescription(this.getHelp());
           channel.send(embed).catch(logger.error);
         });
       }
 
-      const channelPromise = bot.channels.fetch(rc.data.channel_id);
-      const userPromise = User.findOne({discord_id: rc.data.user_id})
+      const channelPromise = getChannel(bot, rc);
+      const userPromise = User.findOne({ discord_id: rc.data.user_id })
         .then(u => {
           if (u == null) {
-            return new User({discord_id: rc.data.user_id}).save();
+            return new User({ discord_id: rc.data.user_id }).save();
           }
           return Promise.resolve(u);
-        })
+        });
 
       Promise.all([userPromise, channelPromise]).then(results => {
         rc.user = results[0];
@@ -107,7 +66,7 @@ export class CommandHandler {
   }
 
   getHelp(): string {
-    let out = "";
+    let out = '';
     if (this.getVersion()) {
       out += `Version ${this.getVersion()}\n`;
     }

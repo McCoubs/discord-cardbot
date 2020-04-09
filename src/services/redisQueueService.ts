@@ -1,28 +1,24 @@
-import {Service} from "../di/serviceDecorator";
-import redis from "redis";
-import {environment} from "../config/environment";
-import {getLogger} from "../utils/logger";
-import RedisSMQ, {QueueMessage} from "rsmq-promise";
-import {ParsedMessage} from "discord-command-parser";
-import {RedisCommand} from "./redisService";
-import {DiscordService} from "./discordService";
+import { Service } from '../di/serviceDecorator';
+import redis from 'redis';
+import { environment } from '../config/environment';
+import { getLogger } from '../utils/logger';
+import RedisSMQ, { QueueMessage } from 'rsmq-promise';
+import { ParsedMessage } from 'discord-command-parser';
+import { RedisCommand } from './redisService';
+import { DiscordService } from './discordService';
 
 const logger = getLogger('redis-queue');
 
 @Service()
 export class RedisQueueService {
-  qname = "DISCORDJOBS";
-  ns = "rsmq";
+  qname = 'DISCORDJOBS';
+  ns = 'rsmq';
   client;
   rsmq: RedisSMQ;
 
-  constructor(
-    public ds: DiscordService
-  ) {
-    this.client = redis.createClient({host: environment.redis.host,});
-    this.client.on('connect', () => {
-      logger.info("Ready");
-    });
+  constructor(public ds: DiscordService) {
+    this.client = redis.createClient({ host: environment.redis.host, });
+    this.client.on('connect', () => logger.info('Ready'));
     this.client.subscribe(`${this.ns}:rt:${this.qname}`);
     this.rsmq = new RedisSMQ({
       host: environment.redis.host,
@@ -31,11 +27,11 @@ export class RedisQueueService {
       realtime: true,
     });
     this.initializeQueues()
-      .then(s => s ? logger.info("queue initialize success") : logger.error("queue initialize failed"));
+      .then(s => s ? logger.info('queue initialize success') : logger.error('queue initialize failed'));
   }
 
   onMessage(fn: CallableFunction) {
-    this.client.on("message", () => {
+    this.client.on('message', () => {
       this.rsmq.getQueueAttributes({qname: this.qname}, (err, resp) => {
         if (err) return logger.error(err);
         for (let i = 0; i < resp.msgs; i++) {
@@ -43,7 +39,7 @@ export class RedisQueueService {
             if (err) return logger.error(err);
             if (!msg.message) return;
 
-            logger.debug("Recieved: " + msg.message);
+            logger.debug('Received: ' + msg.message);
             let rc: RedisCommand = JSON.parse(msg.message);
 
             fn(rc);
@@ -69,7 +65,7 @@ export class RedisQueueService {
       }
     };
     let p = this.rsmq.sendMessage({qname: this.qname, message: JSON.stringify(toSend)});
-    p.then(() => logger.debug("Sending " + JSON.stringify(toSend)));
+    p.then(() => logger.debug('Sending ' + JSON.stringify(toSend)));
     p.catch(logger.error);
     return p;
   }
@@ -78,13 +74,13 @@ export class RedisQueueService {
     return this.rsmq.listQueues()
       .then(q => {
         if (!q.includes(this.qname)) {
-          logger.info("Creating queues");
+          logger.info('Creating queues');
           this.rsmq.createQueue({qname: this.qname}, function (err, resp) {
             if (err) return logger.error(err);
-            if (resp) return logger.info("Created redis queue");
+            if (resp) return logger.info('Created redis queue');
           });
         } else {
-          logger.info("Redis queues exist, skipping create");
+          logger.info('Redis queues exist, skipping create');
         }
         return Promise.resolve(true);
       })

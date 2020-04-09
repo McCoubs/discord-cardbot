@@ -1,12 +1,12 @@
-import {environment} from "../config/environment";
+import { environment } from '../config/environment';
 import redis from 'redis';
-import {getLogger} from "../utils/logger";
-import axios, {AxiosRequestConfig} from "axios";
+import { getLogger } from '../utils/logger';
+import axios, { AxiosRequestConfig } from 'axios';
 import lru from 'redis-lru';
-import {promisify} from 'util';
-import {TextChannel} from "discord.js";
-import {IUser} from "../mongo/models/user.model";
-import {Service} from "../di/serviceDecorator";
+import { promisify } from 'util';
+import { TextChannel } from 'discord.js';
+import { IUser } from '../mongo/models/user.model';
+import { Service } from '../di/serviceDecorator';
 
 export interface RedisCommand {
   command: string
@@ -37,9 +37,7 @@ export class RedisService {
     this.client = redis.createClient({host: environment.redis.host,});
     this.pagesCache = lru(this.client, {max: 100, namespace: 'pages'});
     this.generalLru = lru(this.client, {max: 2000, namespace: 'general'});
-    this.client.on('connect', () => {
-      logger.info("Ready");
-    });
+    this.client.on('connect',() => logger.info('Ready'));
     RedisService._instance = this;
   }
 
@@ -58,7 +56,7 @@ export class RedisService {
     return get(req.url).then(reply => {
       // cache hit end here and return
       if (reply != null) {
-        logger.debug(`Getting ${req.url} from ${lru ? "lru " : ""}cache`);
+        logger.debug(`Getting ${req.url} from ${lru ? 'lru ' : ''}cache`);
         return new Promise(resolve => resolve(JSON.parse(reply) as T));
       }
 
@@ -89,10 +87,6 @@ export class RedisService {
     });
   }
 
-  setIconPage(key: string, val: any): Promise<string> {
-    return this.pagesCache.set(key, JSON.stringify(val));
-  }
-
   get(key: string): Promise<string> {
     return new Promise((resolve, reject) => {
       this.client.get(key, (err, res) => {
@@ -100,9 +94,5 @@ export class RedisService {
         return resolve(res);
       });
     });
-  }
-
-  getIconPage(key: string): Promise<string> {
-    return this.pagesCache.get(key);
   }
 }

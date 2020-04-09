@@ -4,25 +4,8 @@
       "token": ""
     }
   },
-  "es": {
-    "host": "",
-    "auth": {
-      "username": "",
-      "password": ""
-    }
-  },
   "bot": {
     "prefix": "%"
-  },
-  "rapidApi": {
-    "wordsApi": {
-      "key": "",
-      "host": ""
-    },
-    "urbanDictionary": {
-      "host": "",
-      "key": ""
-    }
   },
   "redis": {
     "host": "localhost",

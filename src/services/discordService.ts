@@ -1,7 +1,7 @@
-import {Service} from "../di/serviceDecorator";
-import {Client} from "discord.js";
-import {environment} from "../config/environment";
-import {getLogger} from "../utils/logger";
+import { Service } from '../di/serviceDecorator';
+import { Client } from 'discord.js';
+import { environment } from '../config/environment';
+import { getLogger } from '../utils/logger';
 
 const logger = getLogger('discord');
 
@@ -12,8 +12,8 @@ export class DiscordService {
   constructor() {
     this.client = new Client();
     this.client.on('ready', () => {
-      this.client.user.setActivity("%help").catch(logger.error);
-      logger.info("Ready");
+      this.client.user.setActivity(`${environment.bot.prefix}help`).catch(logger.error);
+      logger.info('Ready');
     });
   }
 
