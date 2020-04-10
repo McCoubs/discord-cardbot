@@ -14,6 +14,7 @@ import { CreateCommand } from './createCommand';
 import { JoinCommand } from './joinCommand';
 import { environment } from '../config/environment';
 import { StartCommand } from './startCommand';
+import { ClearCommand } from './clearCommand';
 
 const logger = getLogger('commands');
 
@@ -31,6 +32,11 @@ export class CommandHandler {
     {
       name: 'join',
       class: JoinCommand,
+      active: true
+    },
+    {
+      name: 'clear',
+      class: ClearCommand,
       active: true
     },
     {

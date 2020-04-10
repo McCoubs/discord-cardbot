@@ -18,6 +18,15 @@ export class Blackjack extends BaseGame {
     return true;
   }
 
+  clear(caller: IUser): boolean {
+    let success = super.clear(caller);
+    this.activePlayer = null;
+    this.hands = null;
+    this.deck = null;
+    this.dealer = null;
+    return success;
+  }
+
   dealHands(): void {
     this.hands = new Map<string, Card[]>();
     this.deck = new decks.StandardDeck();
