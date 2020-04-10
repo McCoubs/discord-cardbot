@@ -1,6 +1,7 @@
 import { GameType } from './gameType';
 import { IUser } from '../mongo/models/user.model';
 import { environment } from '../config/environment';
+import { Client } from 'discord.js';
 
 export interface IGame {
   type: GameType
@@ -9,31 +10,34 @@ export interface IGame {
   inProgress: boolean;
 
   isActive(): boolean;
-  clear(clearer: IUser): boolean;
+  clear(caller: IUser): boolean;
   join(player: IUser): string;
   start(): boolean;
 }
 
 export class BaseGame implements IGame {
-  type: GameType = GameType.blackjack;
+  type: GameType = GameType.base;
   players: Set<string>;
   owner: IUser;
   inProgress: boolean = false;
+  bot: Client;
 
-  constructor(owner: IUser) {
+  constructor(bot: Client, owner: IUser) {
     this.players = new Set<string>([owner.discord_id]);
     this.owner = owner;
+    this.bot = bot;
   }
 
   isActive(): boolean {
     return !!this.players && this.players.size > 0;
   }
 
-  clear(clearer: IUser): boolean {
-    // if clearer is the owner reset properties, otherwise disallow
-    if (this.owner.matches(clearer)) {
+  clear(caller: IUser): boolean {
+    // if caller is the owner reset properties, otherwise disallow
+    if (this.isActive() && this.owner.matches(caller)) {
       this.players.clear();
       this.owner = null;
+      this.inProgress = false;
       return true;
     } else {
       return false;

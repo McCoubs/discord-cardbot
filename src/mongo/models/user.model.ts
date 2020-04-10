@@ -1,11 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 const UserSchema: Schema = new Schema({
-  discord_id: { type: String, required: true },
+  discord_id: { type: String, required: true, unique : true },
   balance: { type: Number, required: true, default: 500 }
 });
 
-UserSchema.methods.matches = function(user: IUser): boolean { return this._id === user._id; };
+UserSchema.methods.matches = function(user: IUser): boolean { return this.discord_id === user.discord_id; };
 
 export interface IUser extends Document {
   _id: string

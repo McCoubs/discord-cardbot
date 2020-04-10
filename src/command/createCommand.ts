@@ -23,9 +23,9 @@ export class CreateCommand extends BaseCommand {
           + `\`${environment.bot.prefix}start\` to start the game whenever you are ready.`
       );
     } else {
-      this.send(rc, `There is a game currently in progress.\nThe owner of the current game`
-          + `must either type \`${environment.bot.prefix}clear\` before trying to create a new game\nor`
-          + `type \`${environment.bot.prefix}restart\` to restart the current game.`
+      this.send(rc, `There is a game currently in progress.\nThe owner of the current game `
+          + `must either type \`${environment.bot.prefix}clear\` before trying to create a new game or`
+          + ` type \`${environment.bot.prefix}restart\` to restart the current game.`
       );
     }
   }

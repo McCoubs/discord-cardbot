@@ -13,6 +13,7 @@ import { TestCommand } from './testCommand';
 import { CreateCommand } from './createCommand';
 import { JoinCommand } from './joinCommand';
 import { environment } from '../config/environment';
+import { StartCommand } from './startCommand';
 
 const logger = getLogger('commands');
 
@@ -33,6 +34,11 @@ export class CommandHandler {
       active: true
     },
     {
+      name: 'start',
+      class: StartCommand,
+      active: true
+    },
+    {
       name: 'test',
       class: TestCommand,
       active: process.env.DISCORDBOT_ENV !== 'production',
@@ -43,20 +49,24 @@ export class CommandHandler {
     this.bot = ds.client;
     let bot = this.bot;
 
+    // add all of the active commands to bot
     this.featureFlags.forEach(f => {
       if (f.active) {
         this.addCommand(f.name, Injector.resolve<Command>(f.class))
       }
     });
 
+    // listen to redis queue messages
     rsq.onMessage((rc: RedisCommand) => {
-      if (rc.command == 'help') {
+      // send help information
+      if (rc.command === 'help') {
         return getChannel(bot, rc).then((channel: TextChannel) => {
           let embed = new MessageEmbed().setDescription(this.getHelp());
           channel.send(embed).catch(logger.error);
         });
       }
 
+      // retrieve channel and user info and attach to the redis command
       const channelPromise = getChannel(bot, rc);
       const userPromise = User.findOne({ discord_id: rc.data.user_id })
         .then(u => {
